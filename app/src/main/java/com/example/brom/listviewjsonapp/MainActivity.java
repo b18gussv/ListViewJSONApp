@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -36,7 +38,7 @@ import java.util.Arrays;
 
 
 public class MainActivity extends AppCompatActivity {
-    private ArrayList<Mountain> mountainArrayList=new ArrayList<>();
+    private ArrayList<Mountain> mountainArrayList=new ArrayList<>(); //En ny ArrayList för bergen att vara i.
 
 
 
@@ -50,12 +52,31 @@ public class MainActivity extends AppCompatActivity {
 
         my_listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), mountainArrayList.get(position).info(), Toast.LENGTH_LONG).show();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) { //När man klickar på ett item körs metoden.
+                Toast.makeText(getApplicationContext(), mountainArrayList.get(position).info(), Toast.LENGTH_LONG).show(); //En toast med informationen om just det item som tryckts på skrivs ut.
             }
         });
-        new FetchData().execute();
+        new FetchData().execute(); //Datan hämtas in först.
     }
+
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item){
+        int id = item.getItemId();
+
+
+        if(id == R.id.action_refresh){
+            new FetchData().execute();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
 
     private class FetchData extends AsyncTask<Void,Void,String>{
         @Override
@@ -121,6 +142,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String o) {
             super.onPostExecute(o);
+
+
             // This code executes after we have received our data. The String object o holds
             // the un-parsed JSON string or is null if we had an IOException during the fetch.
 
@@ -129,11 +152,11 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Mountain",o);
 
             try{
-                JSONArray donkarray = new JSONArray(o);
-                Log.d("Mountain",donkarray.get(0).toString());
+                JSONArray mtarray = new JSONArray(o);
+                Log.d("Mountain",mtarray.get(0).toString());
 
-                for (int i = 0; i < donkarray.length();i++){
-                    JSONObject mountain = donkarray.getJSONObject(i);
+                for (int i = 0; i < mtarray.length();i++){
+                    JSONObject mountain = mtarray.getJSONObject(i);
                     String name = mountain.getString("name");
                     int height = mountain.getInt("size");
                     String location = mountain.getString("location");
@@ -143,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                 final ListView my_listview=(ListView) findViewById(R.id.list_item_textview);
                 my_listview.setAdapter(adapter);
             }catch (JSONException e){
-                Log.e("brom","E:"+e.getMessage());
+                Log.e("donk","E:"+e.getMessage());
             }
 
 
