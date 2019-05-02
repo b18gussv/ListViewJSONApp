@@ -4,6 +4,15 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +20,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 // Create a new class, Mountain, that can hold your JSON data
@@ -25,11 +36,25 @@ import java.net.URL;
 
 
 public class MainActivity extends AppCompatActivity {
+    private ArrayList<Mountain> mountainArrayList=new ArrayList<>();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ArrayAdapter<Mountain> adapter=new ArrayAdapter<Mountain>(this,R.layout.list_item_textview,R.id.list_item_textview,mountainArrayList);
+        final ListView my_listview=(ListView) findViewById(R.id.list_item_textview);
+        my_listview.setAdapter(adapter);
+
+        my_listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getApplicationContext(), mountainArrayList.get(position).info(), Toast.LENGTH_LONG).show();
+            }
+        });
+        new FetchData().execute();
     }
 
     private class FetchData extends AsyncTask<Void,Void,String>{
@@ -45,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
             try {
                 // Construct the URL for the Internet service
-                URL url = new URL("_ENTER_THE_URL_TO_THE_PHP_SERVICE_SERVING_JSON_HERE_");
+                URL url = new URL("http://wwwlab.iit.his.se/brom/kurser/mobilprog/dbservice/admin/getdataasjson.php?type=brom");
 
                 // Create the request to the PHP-service, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -101,7 +126,32 @@ public class MainActivity extends AppCompatActivity {
 
             // Implement a parsing code that loops through the entire JSON and creates objects
             // of our newly created Mountain class.
+            Log.d("Mountain",o);
+
+            try{
+                JSONArray donkarray = new JSONArray(o);
+                Log.d("Mountain",donkarray.get(0).toString());
+
+                for (int i = 0; i < donkarray.length();i++){
+                    JSONObject mountain = donkarray.getJSONObject(i);
+                    String name = mountain.getString("name");
+                    int height = mountain.getInt("size");
+                    String location = mountain.getString("location");
+                    mountainArrayList.add(new Mountain(name,location,height));
+                }
+                ArrayAdapter<Mountain> adapter=new ArrayAdapter<Mountain>(getApplicationContext(),R.layout.list_item_textview,R.id.list_item_textview,mountainArrayList);
+                final ListView my_listview=(ListView) findViewById(R.id.list_item_textview);
+                my_listview.setAdapter(adapter);
+            }catch (JSONException e){
+                Log.e("brom","E:"+e.getMessage());
+            }
+
+
+
+            }
+
         }
+
     }
-}
+
 
