@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item){
         int id = item.getItemId();
         if(id == R.id.action_refresh){
-            mountainArrayList.clear();
+            mountainArrayList.clear(); //Tömmer ArrayListen.
             new FetchData().execute();
             return true;
         }
@@ -152,15 +152,16 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Mountain",o);
 
             try{
-                JSONArray mtarray = new JSONArray(o);
+                JSONArray mtarray = new JSONArray(o); //Skapar en array för bergen att itereras in i.
                 Log.d("Mountain",mtarray.get(0).toString());
 
-                for (int i = 0; i < mtarray.length();i++){
+                for (int i = 0; i < mtarray.length();i++){ //Itererar in bergen till arrayen.
                     JSONObject mountain = mtarray.getJSONObject(i);
                     String name = mountain.getString("name");
                     int height = mountain.getInt("size");
                     String location = mountain.getString("location");
-                    mountainArrayList.add(new Mountain(name,location,height));
+                    mountainArrayList.add(new Mountain(name,location,height)); //Lägger till varje berg som går genom loopen.
+
                 }
                 ArrayAdapter<Mountain> adapter=new ArrayAdapter<Mountain>(getApplicationContext(),R.layout.list_item_textview,R.id.list_item_textview,mountainArrayList);
                 final ListView my_listview=(ListView) findViewById(R.id.list_item_textview);
