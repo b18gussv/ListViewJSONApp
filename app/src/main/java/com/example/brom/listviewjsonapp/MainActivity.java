@@ -58,23 +58,23 @@ public class MainActivity extends AppCompatActivity {
         });
         new FetchData().execute(); //Datan hämtas in först.
     }
-
+ @Override
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
+@Override
     public boolean onOptionsItemSelected(MenuItem item){
         int id = item.getItemId();
-
-
         if(id == R.id.action_refresh){
+            mountainArrayList.clear();
             new FetchData().execute();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 
 
 
